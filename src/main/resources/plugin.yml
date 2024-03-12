@@ -1,0 +1,8 @@
+name: ChunkLoaders
+version: '${project.version}'
+main: im.sooooubway.chunkloaders.ChunkLoaders
+api-version: '1.20'
+commands:
+  chunkloaders:
+    description: Get chunk loaders here
+    aliases: [cl, chunkloader]
