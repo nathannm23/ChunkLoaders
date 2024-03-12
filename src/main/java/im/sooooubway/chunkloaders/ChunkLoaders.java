@@ -34,6 +34,7 @@ public final class ChunkLoaders extends JavaPlugin {
     public static final int THRxTHR_CHUNK_LOADER_EXPIRY = 60*60*3; // 3 hours in seconds
     public static final int FIVExFIVE_CHUNK_LOADER_EXPIRY = 60*60; // 1 hour in seconds
     public static final String CHUNK_LOADERS_META0 = "Chunk Loader";
+    public static final int MAX_CHUNK_LOADERS_PER_PLAYER = 5;
 
 
 
@@ -57,10 +58,10 @@ public final class ChunkLoaders extends JavaPlugin {
         return item;
     }
     public void removeChunkLoader(ChunkLoader chunkLoader) {
-    chunkLoader.unloadChunks();
-    chunkLoader.removeHologram();
-    chunkLoader.getLocation().getBlock().setType(Material.AIR);
-    chunkLoaderManager.removeChunkLoader(chunkLoader);
+        chunkLoader.unloadChunks();
+        chunkLoader.removeHologram();
+        chunkLoader.getLocation().getBlock().setType(Material.AIR);
+        chunkLoaderManager.unmapChunkLoaderFromPlayerAndRemove(chunkLoader.getOwner(), chunkLoader);
     }
     public static ChunkLoaders getInstance() {
         return instance;

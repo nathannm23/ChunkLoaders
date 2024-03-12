@@ -2,16 +2,30 @@ package im.sooooubway.chunkloaders;
 
 import org.bukkit.Location;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.*;
 
 public class ChunkLoaderManager {
-    private List<ChunkLoader> chunkLoaders = new ArrayList<>();
-    private ListIterator<ChunkLoader> chunkLoaderListIterator;
-
+    private final List<ChunkLoader> chunkLoaders = new ArrayList<>();
+    private final HashMap<UUID, Integer> playerChunkLoaders;
+    public ChunkLoaderManager() {
+        playerChunkLoaders = new HashMap<>();
+    }
+    public boolean canAddChunkLoader(UUID playerUUID) {
+        int currentCount = playerChunkLoaders.getOrDefault(playerUUID, 0);
+        return currentCount < ChunkLoaders.MAX_CHUNK_LOADERS_PER_PLAYER;
+    }
     public void addChunkLoader(ChunkLoader chunkLoader) {
         chunkLoaders.add(chunkLoader);
+    }
+    public void mapChunkLoaderToPlayer(UUID playerUUID, ChunkLoader chunkLoader) {
+        int currentCount = playerChunkLoaders.getOrDefault(playerUUID, 0);
+        playerChunkLoaders.put(playerUUID, currentCount + 1);
+        addChunkLoader(chunkLoader);
+    }
+    public void unmapChunkLoaderFromPlayerAndRemove(UUID playerUUID, ChunkLoader chunkLoader) {
+        int currentCount = playerChunkLoaders.getOrDefault(playerUUID, 0);
+        playerChunkLoaders.put(playerUUID, currentCount - 1);
+        removeChunkLoader(chunkLoader);
     }
 
     public void removeChunkLoader(ChunkLoader chunkLoader) {
@@ -19,9 +33,7 @@ public class ChunkLoaderManager {
     }
 
     public ChunkLoader getChunkLoaderAt(Location location) {
-        chunkLoaderListIterator = chunkLoaders.listIterator();
-        while (chunkLoaderListIterator.hasNext()) {
-            ChunkLoader chunkLoader = chunkLoaderListIterator.next();
+        for (ChunkLoader chunkLoader : chunkLoaders) {
             Location chunkLoaderLocation = chunkLoader.getLocation();
             if (chunkLoaderLocation.equals(location)) {
                 return chunkLoader;

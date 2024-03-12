@@ -11,7 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 public class ChunkLoadersCommand implements CommandExecutor {
-    private ChunkLoaders plugin;
+    private final ChunkLoaders plugin;
     public ChunkLoadersCommand(ChunkLoaders plugin) {
         this.plugin = plugin;
     }

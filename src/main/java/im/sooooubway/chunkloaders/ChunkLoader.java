@@ -7,14 +7,18 @@ import org.bukkit.Chunk;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 
-public class ChunkLoader {
-    private String type;
-    private Location location;
-    private long expiryTime;
-    private Chunk[] chunks;
-    private ArmorStand armorStand;
+import java.util.UUID;
 
-    public ChunkLoader(String type, Location location) {
+public class ChunkLoader {
+    private final String type;
+    private final Location location;
+    private final long expiryTime;
+    private final Chunk[] chunks;
+    private ArmorStand armorStand;
+    private final UUID owner;
+
+    public ChunkLoader(String type, Location location, UUID playerUUID) {
+        this.owner = playerUUID;
         this.type = type;
         this.location = location.add(0.0, 1.0, 0.0);
         if(this.type.equals("3x3")){
@@ -86,7 +90,6 @@ public class ChunkLoader {
         }
     }
     public void scheduleRemoval(ChunkLoaders plugin) {
-
         Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
             @Override
             public void run() {
@@ -94,5 +97,9 @@ public class ChunkLoader {
             }
         }, expiryTime * 20L); // expiryTime is in seconds. multiply by 20 bc this parameter is in game ticks
 }
+
+    public UUID getOwner() {
+        return owner;
+    }
 }
 

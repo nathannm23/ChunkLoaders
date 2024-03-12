@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ChunkLoaderEvents implements Listener {
     private final ChunkLoaderManager chunkLoaderManager;
@@ -25,18 +26,25 @@ public class ChunkLoaderEvents implements Listener {
     public void onBlockPlace(BlockPlaceEvent event) {
         ItemStack item = event.getItemInHand();
         ItemMeta meta = item.getItemMeta();
-
-
         if (item.getType() == Material.BEACON && meta.hasLore()) {
             List<String> lore = meta.getLore();
+            assert lore != null;
             if (lore.get(0).equals(ChunkLoaders.CHUNK_LOADERS_META0)) {
-                // if the 0th line is "Chunk Loader", then the 1st line is the type
-                String type = lore.get(1);
-                ChunkLoader chunkLoader = new ChunkLoader(type, event.getBlockPlaced().getLocation().toBlockLocation());
-                chunkLoaderManager.addChunkLoader(chunkLoader);
-                chunkLoader.loadChunks();
-                chunkLoader.createHologram();
-                event.getPlayer().sendMessage("Chunk Loader placed.");
+                UUID playerUUID = event.getPlayer().getUniqueId();
+                if (chunkLoaderManager.canAddChunkLoader(playerUUID)) {
+                    // if the 0th line is "Chunk Loader", then the 1st line is the type
+                    String type = lore.get(1);
+                    ChunkLoader chunkLoader = new ChunkLoader(type, event.getBlockPlaced().getLocation().toBlockLocation(), event.getPlayer().getUniqueId());
+                    chunkLoaderManager.mapChunkLoaderToPlayer(playerUUID, chunkLoader);
+                    chunkLoader.loadChunks();
+                    chunkLoader.createHologram();
+                    event.getPlayer().sendMessage(
+                            ChatColor.translateAlternateColorCodes('&', "&a&lChunk Loader placed."));
+                } else {
+                    event.setCancelled(true);
+                    event.getPlayer().sendMessage(
+                            ChatColor.translateAlternateColorCodes('&', "&cYou have already reached the maximum number of active chunk loaders."));
+                }
             }
         }
     }
@@ -49,8 +57,9 @@ public class ChunkLoaderEvents implements Listener {
                 // unload the chunks and remove it from the list
                 chunkLoader.removeHologram();
                 chunkLoader.unloadChunks();
-                chunkLoaderManager.removeChunkLoader(chunkLoader);
-                event.getPlayer().sendMessage("Chunk Loader removed.");
+                chunkLoaderManager.unmapChunkLoaderFromPlayerAndRemove(event.getPlayer().getUniqueId(), chunkLoader);
+                event.getPlayer().sendMessage(
+                        ChatColor.translateAlternateColorCodes('&', "&a&lChunk Loader removed!"));
             }
         }
     }
@@ -68,7 +77,8 @@ public class ChunkLoaderEvents implements Listener {
                     if (player.getInventory().firstEmpty() != -1) {
                         player.getInventory().addItem(clickedItem);
                     } else {
-                        player.sendMessage("Your inventory is full.");
+                        player.sendMessage(
+                                ChatColor.translateAlternateColorCodes('&', "&c&lYour inventory is full."));
                     }
                 }
             }
