@@ -5,6 +5,10 @@ import org.bukkit.Location;
 import java.util.*;
 
 public class ChunkLoaderManager {
+    public List<ChunkLoader> getChunkLoaders() {
+        return chunkLoaders;
+    }
+
     private final List<ChunkLoader> chunkLoaders = new ArrayList<>();
     private final HashMap<UUID, Integer> playerChunkLoaders;
     public ChunkLoaderManager() {

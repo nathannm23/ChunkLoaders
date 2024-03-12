@@ -25,6 +25,12 @@ public final class ChunkLoaders extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        // remove all chunk loaders until theres have a save/load system
+        // make a copy of the list to avoid concurrent modification
+        List<ChunkLoader> chunkLoaders = new ArrayList<>(chunkLoaderManager.getChunkLoaders());
+        for(ChunkLoader chunkLoader : chunkLoaders) {
+            removeChunkLoader(chunkLoader);
+        }
     }
 
     // utility stuff here to keep the class count down
